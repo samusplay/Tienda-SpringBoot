@@ -5,19 +5,21 @@ import com.example.tienda.models.ProductoRs;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.awt.*;
+import java.util.List;
 
 @RequestMapping(path = "/producto",
         produces = MediaType.APPLICATION_JSON_VALUE)
 public interface ProductoApi {
 
     //Definimos el contrato explicitamente
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/crear", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
      ProductoRs crear(@Valid @RequestBody ProductoRq rq);
+
+    //api listar productos
+    @GetMapping("/listar")
+    List<ProductoRs>listar();
 }

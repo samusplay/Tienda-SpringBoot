@@ -7,6 +7,8 @@ import com.example.tienda.service.ProductoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class ProductoApiController implements ProductoApi {
@@ -16,5 +18,10 @@ public class ProductoApiController implements ProductoApi {
     @Override
     public ProductoRs crear(ProductoRq rq) {
         return productoService.crear(rq);//ya el service valida la logica
+    }
+
+    @Override
+    public List<ProductoRs> listar() {
+        return productoService.listar();
     }
 }

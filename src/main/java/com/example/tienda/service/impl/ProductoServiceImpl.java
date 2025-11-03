@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class ProductoServiceImpl implements ProductoService {
@@ -50,5 +52,24 @@ public class ProductoServiceImpl implements ProductoService {
                 .activo(g.getActivo())
                 .createdAt(g.getCreatedAt())
                 .build();
+    }
+
+    @Override
+    public List<ProductoRs> listar() {
+
+        //Obtener todos los productos de la Db
+        var productos=productoRepository.findAll();
+
+        //mapear entidad para devolver la respuesta
+        return productos.stream()
+                .map(p -> ProductoRs.builder()
+                        .id(p.getId())
+                        .nombre(p.getNombre())
+                        .precio(p.getPrecio())
+                        .sku(p.getSku())
+                        .activo(p.getActivo())
+                        .createdAt(p.getCreatedAt())
+                        .build()
+                ).toList();
     }
 }
