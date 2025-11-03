@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class InventarioServiceImpl implements InventarioService {
@@ -54,6 +56,39 @@ public class InventarioServiceImpl implements InventarioService {
                 .sucursalNombre(guardado.getSucursal().getNombre())
                 .productNombre(guardado.getProducto().getNombre())
                 .stock(guardado.getStock())
+                .build();
+    }
+
+    @Override
+    @Transactional (readOnly = true)
+    public List<InventarioRs> listar(Long idSucursal) {
+        //Validamos que la sucursal exista
+        List<Inventario>data;
+        if(idSucursal !=null){
+            boolean existe=sucursalRepository.existsById(idSucursal);
+            if(!existe){
+                throw  new IllegalArgumentException("La Sucursal indicada no existe");
+            }
+            data=inventarioRepository.findAllBySucursal_Id(idSucursal);
+        }else{
+            //Sin filtro
+            data=inventarioRepository.findAll();
+        }
+        //Devolvemos el Mapeo de respuesta
+        return data.stream()
+                .map(this::toRs)
+                .toList();
+
+    }
+    //Mapeamos Respecto a los DTOS
+    private InventarioRs toRs(Inventario inv) {
+        return InventarioRs.builder()
+                .idInventario(inv.getIdInventario())
+                .idSucursal(inv.getSucursal().getId())
+                .idProducto(inv.getProducto().getId())
+                .sucursalNombre(inv.getSucursal().getNombre())
+                .productNombre(inv.getProducto().getNombre())
+                .stock(inv.getStock())
                 .build();
     }
 }

@@ -7,6 +7,8 @@ import com.example.tienda.service.InventarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class InventarioApiController implements InventarioApi {
@@ -15,5 +17,10 @@ public class InventarioApiController implements InventarioApi {
     @Override
     public InventarioRs crear(InventarioRq rq) {
         return service.crear(rq);
+    }
+
+    @Override
+    public List<InventarioRs> listar(Long idSucursal) {
+        return service.listar(idSucursal);
     }
 }

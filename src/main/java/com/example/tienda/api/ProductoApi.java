@@ -15,6 +15,7 @@ import java.awt.*;
 @RequestMapping(path = "/producto",
         produces = MediaType.APPLICATION_JSON_VALUE)
 public interface ProductoApi {
+
     //Definimos el contrato explicitamente
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
