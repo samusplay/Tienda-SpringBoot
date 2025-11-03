@@ -17,4 +17,8 @@ public interface InventarioRepository extends JpaRepository<Inventario,Long> {
     //Filtros por sku
     List<Inventario>findAllByProducto_Sku(String sku);
 
+    //validar el UNIQUE CON LA base de datos
+    boolean existsBySucursal_IdAndProducto_IdAndIdInventarioNot(
+            Long idSucursal, Long idProducto, Long idInventario);
+
 }

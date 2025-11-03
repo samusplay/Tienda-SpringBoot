@@ -1,6 +1,7 @@
 package com.example.tienda.apicontroller;
 
 import com.example.tienda.api.InventarioApi;
+import com.example.tienda.models.InventarioActualizarRq;
 import com.example.tienda.models.InventarioRq;
 import com.example.tienda.models.InventarioRs;
 import com.example.tienda.service.InventarioService;
@@ -22,5 +23,10 @@ public class InventarioApiController implements InventarioApi {
     @Override
     public List<InventarioRs> listar(Long idSucursal) {
         return service.listar(idSucursal);
+    }
+
+    @Override
+    public InventarioRs actualizar(InventarioActualizarRq rq) {
+        return service.actualizar(rq);
     }
 }
