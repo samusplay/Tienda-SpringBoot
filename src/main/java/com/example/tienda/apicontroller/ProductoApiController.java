@@ -24,4 +24,9 @@ public class ProductoApiController implements ProductoApi {
     public List<ProductoRs> listar() {
         return productoService.listar();
     }
+
+    @Override
+    public ProductoRs actualizar(Long idProducto, ProductoRq rq) {
+        return productoService.actualizar(idProducto, rq);
+    }
 }

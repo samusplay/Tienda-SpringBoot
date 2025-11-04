@@ -22,4 +22,8 @@ public interface ProductoApi {
     //api listar productos
     @GetMapping("/listar")
     List<ProductoRs>listar();
+
+    //api actualizar productos
+    @PostMapping("/actulizar/{idProducto}")
+    ProductoRs actualizar(@PathVariable Long idProducto,@RequestBody ProductoRq rq);
 }

@@ -14,4 +14,6 @@ public interface ProductoService {
     //Firma de listar productos
     List<ProductoRs>listar();
 
+    //actualizar el producto
+    ProductoRs actualizar(Long idProducto,ProductoRq rq);
 }
