@@ -12,4 +12,8 @@ public interface SucursalRepository extends JpaRepository<Sucursal,Long> {
     //Creamos un metodo persoalizable para hacer crud
      boolean existsByNombreIgnoreCase(String nombre);
     Optional<Sucursal>findByNombreIgnoreCase(String nombre);
+
+    //Para tener el mismo nombre de la sucursal pero diferente ciudad
+    boolean existsByNombreIgnoreCaseAndCiudadIgnoreCase(String nombre, String ciudad);
+
 }
