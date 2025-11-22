@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RequestMapping("api/inventario")
-public interface InventarioApi {
+public interface
+InventarioApi {
 
     @PostMapping("/crear")
     @ResponseStatus(HttpStatus.CREATED)
