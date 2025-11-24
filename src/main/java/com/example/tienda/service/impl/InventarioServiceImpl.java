@@ -61,7 +61,7 @@ public class InventarioServiceImpl implements InventarioService {
     }
 
     @Override
-    @Transactional (readOnly = true)
+    @Transactional
     public List<InventarioRs> listar(Long idSucursal) {
         //Validamos que la sucursal exista
         List<Inventario>data;

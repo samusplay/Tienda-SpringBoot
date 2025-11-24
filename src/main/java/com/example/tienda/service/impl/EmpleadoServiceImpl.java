@@ -46,11 +46,21 @@ public class EmpleadoServiceImpl implements EmpleadoService {
 
         // Validar cargo permitido
         String cargo = rq.getCargo().trim().toUpperCase();
-        List<String> cargosValidos = List.of("CAJERO", "BODEGA", "GERENTE", "ADMIN");
+        List<String> cargosValidos = List.of("Gerente",
+                "Subgerente",
+                "Cajero",
+                "Auxiliar de bodega",
+                "Vendedor",
+                "Supervisor",
+                "Administrador");
+        // comparamos ignorando mayúsculas/minúsculas
+        boolean esValido = cargosValidos.stream()
+                .anyMatch(c -> c.equalsIgnoreCase(cargo));
 
-        if (!cargosValidos.contains(cargo)) {
+        if (!esValido) {
             throw new IllegalArgumentException("El cargo indicado no es válido");
         }
+
 
         // Validar sucursal
         Sucursal sucursal = sucursalRepository.findById(rq.getIdSucursal())
@@ -114,8 +124,7 @@ public class EmpleadoServiceImpl implements EmpleadoService {
 
     @Override
     public EmpleadoRs actualizar(Long idEmpleado, EmpleadoRq rq) {
-        // ===== VALIDACIONES =====
-
+        // ===== VALIDACIONES BÁSICAS =====
         if (rq.getPrimerNombre() == null || rq.getPrimerNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El primer nombre es obligatorio");
         }
@@ -132,52 +141,71 @@ public class EmpleadoServiceImpl implements EmpleadoService {
             throw new IllegalArgumentException("Debe indicar la sucursal del empleado");
         }
 
-        // Validar formato del correo
+        // ===== VALIDAR FORMATO CORREO =====
         String nuevoCorreo = rq.getEmail().trim().toLowerCase();
         if (!nuevoCorreo.contains("@") || !nuevoCorreo.contains(".")) {
             throw new IllegalArgumentException("El correo electrónico no tiene un formato válido");
         }
 
+        // ===== VALIDAR CARGO PERMITIDO (lista nueva) =====
         // Validar cargo permitido
-        String cargo = rq.getCargo().trim().toUpperCase();
-        List<String> cargosValidos = List.of("CAJERO", "BODEGA", "GERENTE", "ADMIN");
+        String cargo = rq.getCargo() == null ? null : rq.getCargo().trim();
 
-        if (!cargosValidos.contains(cargo)) {
+        List<String> cargosValidos = List.of(
+                "Gerente",
+                "Subgerente",
+                "Cajero",
+                "Auxiliar de bodega",
+                "Vendedor",
+                "Supervisor",
+                "Administrador"
+        );
+
+    // comparamos ignorando mayúsculas/minúsculas
+        boolean esValido = cargosValidos.stream()
+                .anyMatch(c -> c.equalsIgnoreCase(cargo));
+
+        if (!esValido) {
             throw new IllegalArgumentException("El cargo indicado no es válido");
         }
 
-        // Buscar empleado por ID
+
+        // ===== BUSCAR EMPLEADO =====
         Empleado empleado = empleadoRepository.findById(idEmpleado)
                 .orElseThrow(() -> new IllegalArgumentException("El empleado indicado no existe"));
 
-        // Validar correo único si cambia
-        if (!nuevoCorreo.equals(empleado.getEmail()) &&
-                empleadoRepository.existsByEmail(nuevoCorreo)) {
+        // ===== VALIDAR CORREO ÚNICO SI CAMBIA =====
+        if (!nuevoCorreo.equalsIgnoreCase(empleado.getEmail())
+                && empleadoRepository.existsByEmail(nuevoCorreo)) {
             throw new IllegalArgumentException("Ese correo ya está en uso por otro empleado");
         }
 
-        // Validar sucursal existente
+        // ===== VALIDAR SUCURSAL =====
         Sucursal sucursal = sucursalRepository.findById(rq.getIdSucursal())
                 .orElseThrow(() -> new IllegalArgumentException("La sucursal indicada no existe"));
 
         // ===== ACTUALIZAR CAMPOS =====
-
         empleado.setPrimerNombre(rq.getPrimerNombre().trim());
-        empleado.setSegundoNombre(rq.getSegundoNombre() != null ? rq.getSegundoNombre().trim() : null);
-        empleado.setApellidoPaterno(rq.getApellidoPaterno());
-        empleado.setApellidoMaterno(rq.getApellidoMaterno());
-        empleado.setCargo(cargo);
+        empleado.setSegundoNombre(
+                rq.getSegundoNombre() != null ? rq.getSegundoNombre().trim() : null
+        );
+        empleado.setApellidoPaterno(
+                rq.getApellidoPaterno() != null ? rq.getApellidoPaterno().trim() : null
+        );
+        empleado.setApellidoMaterno(
+                rq.getApellidoMaterno() != null ? rq.getApellidoMaterno().trim() : null
+        );
+        empleado.setCargo(cargo); // dejamos el texto tal cual lo envía el front
         empleado.setSucursal(sucursal);
         empleado.setEmail(nuevoCorreo);
-        empleado.setActivo(rq.getActivo());
-        //Guardamos
+        empleado.setActivo(rq.getActivo() != null ? rq.getActivo() : empleado.getActivo());
+
         empleadoRepository.save(empleado);
 
-        // Volvemos cargar
+        // Si quieres recargar con fetch join:
         Empleado actualizado = empleadoRepository.findByIdWithSucursal(idEmpleado);
 
         // ===== RESPUESTA =====
-
         return EmpleadoRs.builder()
                 .id(actualizado.getId())
                 .primerNombre(actualizado.getPrimerNombre())
