@@ -21,4 +21,5 @@ public class ProductoRs {
     private String sku;
     private Boolean activo;
     private LocalDateTime createdAt;
+    private String sucursal;
 }

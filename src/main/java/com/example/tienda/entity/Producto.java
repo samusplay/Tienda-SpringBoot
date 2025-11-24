@@ -36,4 +36,8 @@ public class Producto {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_sucursal", nullable = false)
+    private Sucursal sucursal;
+
 }
