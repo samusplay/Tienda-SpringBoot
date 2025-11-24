@@ -4,11 +4,12 @@ import com.example.tienda.models.InventarioActualizarRq;
 import com.example.tienda.models.InventarioRq;
 import com.example.tienda.models.InventarioRs;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("api/inventario")
+@RequestMapping(path = "/inventario", produces = MediaType.APPLICATION_JSON_VALUE)
 public interface
 InventarioApi {
 
