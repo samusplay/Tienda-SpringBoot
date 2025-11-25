@@ -8,17 +8,23 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-//lo que va responder el backend
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class VentaRs {
-    private Long id;
-    private LocalDateTime fecha;
+public class DetalleVentaReporteRs {
+    // Datos de la venta
+    private Long idVenta;
+    private LocalDateTime fechaVenta;
     private String sucursalNombre;
     private String clienteNombre;
     private String empleadoNombre;
+
+    // Datos del producto / detalle
+    private Long idDetalle;
+    private Long idProducto;
     private String productoNombre;
-    private BigDecimal total;
+    private Integer cantidad;
+    private BigDecimal precioUnit;
+    private BigDecimal subtotal;
 }

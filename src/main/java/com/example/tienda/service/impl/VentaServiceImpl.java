@@ -1,19 +1,14 @@
 package com.example.tienda.service.impl;
 
-import com.example.tienda.entity.Cliente;
-import com.example.tienda.entity.Empleado;
-import com.example.tienda.entity.Sucursal;
-import com.example.tienda.entity.Venta;
+import com.example.tienda.entity.*;
 import com.example.tienda.models.VentaActualizarRq;
 import com.example.tienda.models.VentaRq;
 import com.example.tienda.models.VentaRs;
-import com.example.tienda.repository.ClienteRepository;
-import com.example.tienda.repository.EmpleadoRepository;
-import com.example.tienda.repository.SucursalRepository;
-import com.example.tienda.repository.VentaRepository;
+import com.example.tienda.repository.*;
 import com.example.tienda.service.VentaService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,6 +23,8 @@ public class VentaServiceImpl implements VentaService {
     private final SucursalRepository sucursalRepository;
     private final ClienteRepository clienteRepository;
     private final EmpleadoRepository empleadoRepository;
+    private final ProductoRepository productoRepository;
+    private final  InventarioRepository inventarioRepository;
     @Override
     public VentaRs crear(VentaRq rq) {
         // Validar sucursal
@@ -42,17 +39,38 @@ public class VentaServiceImpl implements VentaService {
         Empleado empleado = empleadoRepository.findById(rq.getIdEmpleado())
                 .orElseThrow(() -> new IllegalArgumentException("El empleado indicado no existe"));
 
+        // Validar producto + importante para luego validar en el builder
+        Producto producto = productoRepository.findById(rq.getIdProducto())
+                .orElseThrow(() -> new IllegalArgumentException("El producto indicado no existe"));
+
         // Validar total > 0
         BigDecimal total = rq.getTotal();
         if (total == null || total.signum() <= 0) {
             throw new IllegalArgumentException("El total debe ser mayor a cero");
         }
+        Inventario inventario = inventarioRepository
+                .findBySucursal_IdAndProducto_Id(rq.getIdSucursal(), rq.getIdProducto())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No hay inventario para este producto en la sucursal"));
+
+        // Por ahora asumimos cantidad = 1 por venta
+        int cantidadVenta = 1;
+
+        // Verificar stock suficiente
+        if (inventario.getStock() < cantidadVenta) {
+            throw new IllegalArgumentException("Stock insuficiente para el producto");
+        }
+
+        // Descontar stock
+        inventario.setStock(inventario.getStock() - cantidadVenta);
+        inventarioRepository.save(inventario);
 
         // Construimos la venta
         Venta venta = Venta.builder()
                 .sucursal(sucursal)
                 .cliente(cliente)
                 .empleado(empleado)
+                .producto(producto)   // <-- aquí ya NO se usa new Producto()
                 .total(total)
                 .build();
 
@@ -62,6 +80,7 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
+    @Transactional
     public List<VentaRs> listar() {
         return ventaRepository.findAllWithRelations()
                 .stream()
@@ -70,6 +89,7 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
+    @Transactional
     public VentaRs actualizar(Long idVenta, VentaActualizarRq rq) {
         Venta venta = Optional.ofNullable(
                 ventaRepository.findVentaWithRelations(idVenta)
@@ -87,8 +107,13 @@ public class VentaServiceImpl implements VentaService {
         Empleado empleado = empleadoRepository.findById(rq.getIdEmpleado())
                 .orElseThrow(() -> new IllegalArgumentException("El empleado indicado no existe"));
 
+        // Validar que el producto exista
+        Producto producto = productoRepository.findById(rq.getIdProducto())
+                .orElseThrow(() -> new IllegalArgumentException("El producto indicado no existe"));
+
         // Validar monto
-        if (rq.getTotal() == null || rq.getTotal().doubleValue() <= 0) {
+        BigDecimal total = rq.getTotal();
+        if (total == null || total.signum() <= 0) {
             throw new IllegalArgumentException("El total debe ser mayor a cero");
         }
 
@@ -96,22 +121,15 @@ public class VentaServiceImpl implements VentaService {
         venta.setSucursal(sucursal);
         venta.setCliente(cliente);
         venta.setEmpleado(empleado);
-        venta.setTotal(rq.getTotal());
-        //guardamos cambios
+        venta.setProducto(producto);   // <-- nuevo
+        venta.setTotal(total);
+
         ventaRepository.save(venta);
 
         Venta actualizado = ventaRepository.findVentaWithRelations(idVenta);
 
-
-        //Construimos la respuesta
-        return VentaRs.builder()
-                .id(actualizado.getId())
-                .fecha(actualizado.getFecha())
-                .sucursalNombre(actualizado.getSucursal().getNombre())
-                .clienteNombre(actualizado.getCliente().getNombre())
-                .empleadoNombre(actualizado.getEmpleado().getPrimerNombre())
-                .total(actualizado.getTotal())
-                .build();
+        // Construimos la respuesta (o simplemente return mapToRs(actualizado);)
+        return mapToRs(actualizado);
     }
 
     //Metodos privados
@@ -134,6 +152,7 @@ public class VentaServiceImpl implements VentaService {
                 .sucursalNombre(v.getSucursal().getNombre())
                 .clienteNombre(clienteNombre)
                 .empleadoNombre(empleadoNombre)
+                .productoNombre(v.getProducto().getNombre())
                 .total(v.getTotal())
                 .build();
     }

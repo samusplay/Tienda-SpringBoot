@@ -23,6 +23,9 @@ public class VentaRq {
     @NotNull(message = "El empleado es obligatorio")
     private Long idEmpleado;
 
+    @NotNull(message = "El producto es obligatorio")
+    private Long idProducto;
+
     @NotNull(message = "El total de la venta es obligatorio")
     @DecimalMin(value = "0.01", message = "El total debe ser mayor a cero")
     private BigDecimal total;

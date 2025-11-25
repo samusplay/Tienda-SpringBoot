@@ -21,8 +21,11 @@ public class VentaActualizarRq {
     @NotNull(message = "Debe indicar el cliente")
     private Long idCliente;
 
-    @NotNull(message = "Debe indicar el empleado")
+    @NotNull(message = "Debe indicar el producto")
     private Long idEmpleado;
+
+
+    private Long idProducto;
 
     @NotNull(message = "El total no puede estar vacío")
     @DecimalMin(value = "0.01", message = "El total debe ser mayor a 0")

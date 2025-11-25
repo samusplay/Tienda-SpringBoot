@@ -33,6 +33,10 @@ public class Venta {
     @JoinColumn(name = "id_empleado", nullable = false)
     private Empleado empleado;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_producto", nullable = false) // <-- NUEVO
+    private Producto producto;
+
     @Column(name = "total", nullable = false, precision = 12, scale = 2)
     private BigDecimal total;
 

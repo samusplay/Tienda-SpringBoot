@@ -28,4 +28,6 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
            JOIN FETCH p.sucursal
            """)
     List<Producto> findAllWithSucursal();
+
+
 }

@@ -4,6 +4,7 @@ import com.example.tienda.entity.Inventario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface InventarioRepository extends JpaRepository<Inventario,Long> {
     boolean existsBySucursal_NombreIgnoreCaseAndProducto_Sku(String nombreSucursal, String sku);
@@ -20,5 +21,8 @@ public interface InventarioRepository extends JpaRepository<Inventario,Long> {
     //validar el UNIQUE CON LA base de datos
     boolean existsBySucursal_IdAndProducto_IdAndIdInventarioNot(
             Long idSucursal, Long idProducto, Long idInventario);
+
+    //validar el inventario en ventas
+    Optional<Inventario> findBySucursal_IdAndProducto_Id(Long sucursalId, Long productoId);
 
 }

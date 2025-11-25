@@ -28,4 +28,6 @@ public interface VentaRepository extends JpaRepository<Venta,Long> {
         WHERE v.id = :idVenta
     """)
     Venta findVentaWithRelations(@Param("idVenta") Long idVenta);
+
+
 }
